@@ -11,6 +11,8 @@ pipeline{
 		stage('Build') {
 
 			steps {
+			    sh 'sudo service docker start'
+                sh 'sudo service docker status'
 				sh 'docker build -t fredyalmenares/nextapp:latest .'
 			}
 		}

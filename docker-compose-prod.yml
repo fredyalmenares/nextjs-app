@@ -1,10 +1,47 @@
 services:
   nextapp:
     image: fredyalmenares/nextapp:latest
-    ports:
-      - 3003:3003
-    command: ["yarn", "dev"]
+    command: ["yarn", "start:prod"]
     environment:
       - "NODE_ENV=development"
     stdin_open: true
     tty: true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextapp.rule=PathPrefix(`${API_PREFIX}`)"
+      - "traefik.http.routers.nextapp.entrypoints=web"
+      - "traefik.http.routers.nextapp.service=nextapp"
+      - "traefik.http.services.nextapp.loadbalancer.server.port=${SERVER_PORT}"
+    env_file:
+      - .env
+  traefik:
+    image: "traefik:v2.6.1"
+    container_name: "traefik"
+    restart: always
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dozzle.rule=PathPrefix(`/aphl/dashboard`)"
+      - "traefik.http.routers.dozzle.entrypoints=web"
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOZZLE_BASE=/aphl/dashboard

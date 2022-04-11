@@ -4,6 +4,7 @@ module.exports = (phase, { defaultConfig }) => {
      */
     const nextConfig = {
         /* config options here */
+        basePath: process.env.API_PREFIX,
     }
     return nextConfig
 }

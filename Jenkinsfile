@@ -11,7 +11,7 @@ pipeline{
 		stage('Build') {
 
 			steps {
-				sh 'docker build -t fredyalmenares/nextapp:latest .'
+				sh 'docker build -t $DOCKER_HUB_REPO .'
 			}
 		}
 
@@ -25,7 +25,7 @@ pipeline{
 		stage('Push') {
 
 			steps {
-				sh 'docker push fredyalmenares/nextapp:latest'
+				sh 'docker push $DOCKER_HUB_REPO'
 			}
 		}
 	}
